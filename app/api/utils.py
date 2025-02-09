@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import time
 import math
-from app.api.schemas.receipt import ReceiptPayload
+from app.api.schemas.receipt import Receipt
 
-async def calculate_points(receipt: ReceiptPayload):
+async def calculate_points(receipt: Receipt):
     points_total = 0
 
     # One point for every alphanumeric character in the retailer name.
@@ -29,14 +29,14 @@ async def calculate_points(receipt: ReceiptPayload):
 
     # 6 points if the day in the purchase date is odd.
     if receipt.purchaseDate:
-        day = int(receipt.purchaseDate.split("-")[2])
+        day = receipt.purchaseDate.day
         if day % 2 != 0:
             points_total += 6
 
     # 10 points if the time of purchase is after 2:00pm and before 4:00pm.
     if receipt.purchaseTime:
-        purchase_time_obj = datetime.strptime(receipt.purchaseTime, "%H:%M")
-        if purchase_time_obj.hour == 14 or (purchase_time_obj.hour == 15 and purchase_time_obj.minute == 0):
+        purchase_time_obj = receipt.purchaseTime
+        if time(14, 0) <= purchase_time_obj <= time(15, 59):
             points_total += 10
 
     return points_total
